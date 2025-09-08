@@ -1,12 +1,15 @@
 import pygame
 import sys
 
+# =====================
 # Initialisation
+# =====================
 pygame.init()
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 900, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Paradoxes de Zénon")
-font = pygame.font.SysFont(None, 40)
+font = pygame.font.SysFont("Arial", 32)
+small_font = pygame.font.SysFont("Arial", 24)
 clock = pygame.time.Clock()
 
 # États possibles
@@ -17,51 +20,92 @@ FLECHE = "fleche"
 
 state = MENU
 
-# --- Fonctions de rendu ---
+# =====================
+# Fonctions de rendu
+# =====================
 def draw_menu():
     screen.fill((240, 240, 240))
-    title = font.render("Choisissez un paradoxe", True, (0, 0, 0))
+    title = font.render("Choisissez un paradoxe de Zénon", True, (0, 0, 0))
     screen.blit(title, (WIDTH//2 - title.get_width()//2, 100))
 
-    options = ["1 - Achille et la tortue", "2 - La dichotomie", "3 - La flèche", "ECHAP - Quitter"]
+    options = [
+        "1 - Achille et la tortue",
+        "2 - La dichotomie",
+        "3 - La flèche",
+        "ECHAP - Quitter"
+    ]
     for i, text in enumerate(options):
         t = font.render(text, True, (50, 50, 50))
-        screen.blit(t, (200, 200 + i*60))
+        screen.blit(t, (WIDTH//2 - 200, 200 + i*60))
 
 
 def draw_achille(step):
     screen.fill((220, 255, 220))
-    achille_x = min(100 + step*5, WIDTH-50)
-    tortue_x = min(200 + step*2, WIDTH-50)
+
+    # Positions évolutives
+    achille_x = min(100 + step*6, WIDTH-50)
+    tortue_x = min(200 + step*3, WIDTH-50)
+
+    # Dessins
     pygame.draw.circle(screen, (0, 0, 255), (achille_x, HEIGHT//2), 20)  # Achille
     pygame.draw.circle(screen, (255, 0, 0), (tortue_x, HEIGHT//2), 15)  # Tortue
 
+    # Texte
     text = font.render("Achille et la tortue", True, (0, 0, 0))
     screen.blit(text, (20, 20))
+
+    explanation = small_font.render(
+        "Achille court plus vite, mais il doit toujours rejoindre l'endroit où la tortue était.",
+        True, (0, 0, 0)
+    )
+    screen.blit(explanation, (50, HEIGHT - 80))
 
 
 def draw_dichotomie(step):
     screen.fill((255, 240, 220))
+
+    # Ligne de course
     start, end = 100, WIDTH - 100
     pos = start + (end-start) * (1 - 1/(step+1))
+
     pygame.draw.line(screen, (0, 0, 0), (start, HEIGHT//2), (end, HEIGHT//2), 3)
     pygame.draw.circle(screen, (0, 150, 0), (int(pos), HEIGHT//2), 15)
 
+    # Texte
     text = font.render("La dichotomie", True, (0, 0, 0))
     screen.blit(text, (20, 20))
+
+    explanation = small_font.render(
+        "La pierre doit toujours franchir la moitié de la distance restante. Une infinité d'étapes ?",
+        True, (0, 0, 0)
+    )
+    screen.blit(explanation, (50, HEIGHT - 80))
 
 
 def draw_fleche(step):
     screen.fill((220, 220, 255))
+
+    # Flèche immobile
     arrow_rect = pygame.Rect(WIDTH//2 - 40, HEIGHT//2 - 5, 80, 10)
     pygame.draw.rect(screen, (150, 0, 0), arrow_rect)
-    pygame.draw.polygon(screen, (150, 0, 0), [(WIDTH//2+40, HEIGHT//2-10), (WIDTH//2+60, HEIGHT//2), (WIDTH//2+40, HEIGHT//2+10)])
+    pygame.draw.polygon(screen, (150, 0, 0),
+        [(WIDTH//2+40, HEIGHT//2-10), (WIDTH//2+60, HEIGHT//2), (WIDTH//2+40, HEIGHT//2+10)]
+    )
 
-    text = font.render(f"La flèche (t = {step})", True, (0, 0, 0))
+    # Texte
+    text = font.render("La flèche", True, (0, 0, 0))
     screen.blit(text, (20, 20))
 
+    explanation = small_font.render(
+        f"À l'instant t = {step}, la flèche est figée. Le mouvement est-il une illusion ?",
+        True, (0, 0, 0)
+    )
+    screen.blit(explanation, (50, HEIGHT - 80))
 
-# --- Boucle principale ---
+
+# =====================
+# Boucle principale
+# =====================
 step = 0
 while True:
     for event in pygame.event.get():
